@@ -28,7 +28,6 @@ class StudentRecords {
             rollNumber,
             listOfSubject
         )
-
         DummyDB.addStudentToDB(newStudent)
         println("$name total marks : ${newStudent.totalMarksScored()}")
         println("$name percentage : ${newStudent.percentage()} %")
@@ -39,16 +38,27 @@ class StudentRecords {
         var rollNumber = readln().toInt()
         var deletedStudent = DummyDB.deleteStudentFromDb(rollNumber)
         if (deletedStudent == null) {
-            println("Student with roll number ${rollNumber} not found")
+            println("Student with roll number $rollNumber not found")
         } else {
             println("Successfully deleted ${deletedStudent.name} records")
         }
     }
 
-    private fun searchAStudent() { // later add search by name functionality
+    private fun searchAStudentByRollNumber() { // later add search by name functionality
         print("Enter the roll number of the student to be searched : ")
         var studentRollNum = readln().toInt()
-        var stud = DummyDB.searchStudentFromDb(studentRollNum)
+        var stud = DummyDB.searchStudentByRollNumberFromDb(studentRollNum)
+        if (stud == null) {
+            println("Student not found!!!")
+        } else {
+            displayStudentDetails(stud)
+        }
+    }
+
+    private fun searchStudentByName() {
+        print("Enter the name of the student to be searched : ")
+        var studentName = readln()
+        var stud = DummyDB.searchStudentByNameFromDB(studentName)
         if (stud == null) {
             println("Student not found!!!")
         } else {
@@ -85,27 +95,36 @@ class StudentRecords {
             var choice = readln()
             when (choice) {
                 "1" -> {
-                    println("You pressed 1")
                     addStudent()
                 }
 
                 "2" -> {
-                    println("You pressed 2")
                     deleteStudent()
                 }
-
                 "3" -> {
-                    println("You pressed 3")
-                    searchAStudent()
+                    println("1) Search student by roll number ")
+                    println("2) Search student by name ")
+                    var ip = readln().toInt()
+                    when (ip) {
+                        1 -> {
+                            searchAStudentByRollNumber()
+                        }
+
+                        2 -> {
+                            searchStudentByName()
+                        }
+
+                        else -> {
+                            println("Invalid Input ")
+                        }
+                    }
                 }
 
                 "4" -> {
-                    println("You pressed 4")
                     showAllStudent()
                 }
 
                 "5" -> {
-                    println("You pressed 5")
                     userWantsToExitFlag = true
                 }
 
