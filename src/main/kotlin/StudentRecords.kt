@@ -1,7 +1,7 @@
 class StudentRecords {
     private fun addStudent() {
         print("Enter name of student: ")
-        var name = readln()
+        var name = readln().lowercase()
         print("Enter year of admission: ")
         var yearOfAdmission = readln().toInt()
         print("Enter roll number: ")
@@ -33,8 +33,8 @@ class StudentRecords {
         )
         DummyDB.addStudentToDB(newStudent)
         println()
-        println("$name total marks : ${newStudent.totalMarksScored()}")
-        println("$name percentage : ${newStudent.percentage()} %")
+        println("Displaying the Mark sheet ")
+        displayStudentsMarkSheet(newStudent)
         println()
     }
 
@@ -45,8 +45,30 @@ class StudentRecords {
         if (deletedStudent == null) {
             println("Student with roll number $rollNumber not found")
         } else {
-            println("Successfully deleted ${deletedStudent.name} records")
+            var formattedName = convertNameToProperFormat(deletedStudent.name)
+            println("Successfully deleted $formattedName records")
         }
+    }
+
+    private fun convertNameToProperFormat(str: String): String {
+        var splitStrList = str.split(" ")
+        var fullNameStr = ""
+        for (str in splitStrList) {
+            var cap = str.get(0).uppercase()
+            var capStr = cap + str.substring(1)
+            fullNameStr += "$capStr "
+        }
+        return fullNameStr
+    }
+
+    private fun displayStudent(student: Student) {
+        // make 1st letter of first and last name capital
+        println()
+        var convertedName = convertNameToProperFormat(student.name)
+        println("Student Name : $convertedName ")
+        println("Student Roll Number : ${student.rollNum}")
+        println("Student Year Of Admission : ${student.yearOfAdmission}")
+        println()
     }
 
     private fun searchAStudentByRollNumber() { // later add search by name functionality
@@ -56,7 +78,7 @@ class StudentRecords {
         if (stud == null) {
             println("Student not found!!!")
         } else {
-            displayStudentDetails(stud)
+            displayStudent(stud)
         }
     }
 
@@ -67,7 +89,7 @@ class StudentRecords {
         if (stud == null) {
             println("Student not found!!!")
         } else {
-            displayStudentDetails(stud)
+            displayStudent(stud)
         }
     }
 
@@ -75,7 +97,7 @@ class StudentRecords {
         println("Showing All Students")
         var listOfStudents = DummyDB.listOfStudents
         for (student in listOfStudents) {
-            displayStudentDetails(student)
+            displayStudent(student)
         }
     }
 
@@ -86,23 +108,25 @@ class StudentRecords {
         return spaceString
     }
 
-    private fun displayStudentDetails(student: Student) {
+    private fun displayStudentsMarkSheet(student: Student) {
         var spaceStringBtwNameAndYoaHeader = getSpacesString(18)
         var spaceStringBtwYoaAndRollNumberHeader = getSpacesString(26)
         var spaceStringBtwYoaAndRoll = getSpacesString(25)
 
+        var formattedName = convertNameToProperFormat(student.name)
+
         println()
         println("NAME${spaceStringBtwNameAndYoaHeader}YOA${spaceStringBtwYoaAndRollNumberHeader}ROLL NUMBER")
-        if (student.name.length < 15) {
-            var spaceCal = 15 - student.name.length + 7
+        if (student.name.length < 15) { // If name is bigger than length 15 then simply break it into 2 parts and show the other part in the lower row
+            var spaceCal = 15 - student.name.length + 6
             var spaceStringBtwNameAndYoa = getSpacesString(spaceCal)
             print(
-                "${student.name}$spaceStringBtwNameAndYoa${student.yearOfAdmission}" +
+                "${formattedName}$spaceStringBtwNameAndYoa${student.yearOfAdmission}" +
                         "$spaceStringBtwYoaAndRoll${student.rollNum}"
             )
         } else {
-            var part1OfName = student.name.substring(0, 15)
-            var part2OfName = student.name.substring(15)
+            var part1OfName = formattedName.substring(0, 15)
+            var part2OfName = formattedName.substring(15)
             var spaceStringBetweenP1AndYoa = getSpacesString(7)
             println(
                 "$part1OfName${spaceStringBetweenP1AndYoa}${student.yearOfAdmission}" +
@@ -116,6 +140,7 @@ class StudentRecords {
         var spaceStrBtwObtainedAndTotalHeader = getSpacesString(15)
         var spaceStringBtwObtainedAndTotal = getSpacesString(27)
         println()
+
         println("SUBJECT${spaceStrBtwSubjectAndObtainedHeader}MARKS OBTAINED${spaceStrBtwObtainedAndTotalHeader}TOTAL MARKS")
         for (subject in student.subjects) {
             var spaceCal = 22 - subject.nameOfSubject.length
@@ -130,14 +155,44 @@ class StudentRecords {
         println()
     }
 
+    private fun advanceSearch(): List<Student>? {
+        print("Enter search query: ")
+        var query = readln().lowercase() // because every name in DB is stored
+        // as lowercase to maintain consistency
+        return DummyDB.advanceSearch(query)
+    }
+
+    private fun showStudentsUsingAdvanceSearch() {
+        var listOfStudents = advanceSearch()
+        if (listOfStudents.isNullOrEmpty()) {
+            print("No student matched with query")
+            return
+        }
+        println()
+        println("Students that matched query are :-")
+        for (stud in listOfStudents) {
+            displayStudent(stud)
+        }
+    }
+
+    private fun showStudentMarkSheet() {
+        var listOfStudents = advanceSearch()
+        if (listOfStudents != null) {
+            for (student in listOfStudents) {
+                displayStudentsMarkSheet(student)
+            }
+        }
+    }
+
     fun showMenu() {
         var userWantsToExitFlag = false
         do {
-            println("1)Add New Student")
-            println("2)Delete Student")
-            println("3)Search A Student")
-            println("4)Show all students")
-            println("5)Exit")
+            println("1)Add new student")
+            println("2)Delete student")
+            println("3)Search a student")
+            println("4)Show all student details")
+            println("5)Show a particular students mark sheet")
+            println("6)Exit")
             print("Enter your choice : ")
             var choice = readln()
             when (choice) {
@@ -152,6 +207,8 @@ class StudentRecords {
                 "3" -> {
                     println("1) Search student by roll number ")
                     println("2) Search student by name ")
+                    println("3) Advance search ")
+
                     var ip = readln().toInt()
                     when (ip) {
                         1 -> {
@@ -162,8 +219,12 @@ class StudentRecords {
                             searchStudentByName()
                         }
 
+                        3 -> {
+                            showStudentsUsingAdvanceSearch()
+                        }
+
                         else -> {
-                            println("Invalid Input ")
+                            println("You entered invalid number")
                         }
                     }
                 }
@@ -173,6 +234,10 @@ class StudentRecords {
                 }
 
                 "5" -> {
+                    showStudentMarkSheet()
+                }
+
+                "6" -> {
                     userWantsToExitFlag = true
                 }
 
