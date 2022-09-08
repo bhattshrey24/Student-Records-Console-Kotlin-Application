@@ -2,6 +2,8 @@ class StudentRecords {
     private fun addStudent() {
         print("Enter name of student: ")
         var name = readln()
+        print("Enter year of admission: ")
+        var yearOfAdmission = readln().toInt()
         print("Enter roll number: ")
         var rollNumber = readln().toInt()
 
@@ -10,7 +12,7 @@ class StudentRecords {
         for (i in 1..3) { // List of subjects
             print("Enter name of subject $i : ")
             var subName = readln()
-            print("Enter Marks In $subName : ")
+            print("Enter Marks obtained In $subName : ")
             var marksScored = readln().toInt()
             print("Enter Total marks In $subName : ")
             var totalMarks = readln().toInt()
@@ -26,11 +28,14 @@ class StudentRecords {
         var newStudent = Student(
             name,
             rollNumber,
+            yearOfAdmission,
             listOfSubject
         )
         DummyDB.addStudentToDB(newStudent)
+        println()
         println("$name total marks : ${newStudent.totalMarksScored()}")
         println("$name percentage : ${newStudent.percentage()} %")
+        println()
     }
 
     private fun deleteStudent() {
@@ -74,14 +79,56 @@ class StudentRecords {
         }
     }
 
-    private fun displayStudentDetails(student: Student) {
-        println("Student name : ${student.name}  ")
-        for (subject in student.subjects) {
-            println("Marks scored in ${subject.nameOfSubject} : ${subject.marksScored}/${subject.totalMarks} ")
-        }
-        println()
+    private fun getSpacesString(numOfSpaces: Int): String {
+        var spaceString = ""
+        for (i in 1..numOfSpaces)
+            spaceString += " "
+        return spaceString
     }
 
+    private fun displayStudentDetails(student: Student) {
+        var spaceStringBtwNameAndYoaHeader = getSpacesString(18)
+        var spaceStringBtwYoaAndRollNumberHeader = getSpacesString(26)
+        var spaceStringBtwYoaAndRoll = getSpacesString(25)
+
+        println()
+        println("NAME${spaceStringBtwNameAndYoaHeader}YOA${spaceStringBtwYoaAndRollNumberHeader}ROLL NUMBER")
+        if (student.name.length < 15) {
+            var spaceCal = 15 - student.name.length + 7
+            var spaceStringBtwNameAndYoa = getSpacesString(spaceCal)
+            print(
+                "${student.name}$spaceStringBtwNameAndYoa${student.yearOfAdmission}" +
+                        "$spaceStringBtwYoaAndRoll${student.rollNum}"
+            )
+        } else {
+            var part1OfName = student.name.substring(0, 15)
+            var part2OfName = student.name.substring(15)
+            var spaceStringBetweenP1AndYoa = getSpacesString(7)
+            println(
+                "$part1OfName${spaceStringBetweenP1AndYoa}${student.yearOfAdmission}" +
+                        "$spaceStringBtwYoaAndRoll${student.rollNum}"
+            )
+
+            print("$part2OfName")
+        }
+        println()
+        var spaceStrBtwSubjectAndObtainedHeader = getSpacesString(15)
+        var spaceStrBtwObtainedAndTotalHeader = getSpacesString(15)
+        var spaceStringBtwObtainedAndTotal = getSpacesString(27)
+        println()
+        println("SUBJECT${spaceStrBtwSubjectAndObtainedHeader}MARKS OBTAINED${spaceStrBtwObtainedAndTotalHeader}TOTAL MARKS")
+        for (subject in student.subjects) {
+            var spaceCal = 22 - subject.nameOfSubject.length
+            var spaceStrBtwSubjectAndObtained = getSpacesString(spaceCal)
+            println("${subject.nameOfSubject}${spaceStrBtwSubjectAndObtained}${subject.marksScored}${spaceStringBtwObtainedAndTotal}${subject.totalMarks} ")
+        }
+        var spaceBeforeTotal = getSpacesString(22)
+        var spaceBetweenTotalAndPerHeader = getSpacesString(24)
+        println("${spaceBeforeTotal}TOTAL${spaceBetweenTotalAndPerHeader}PERCENTAGE")
+        var spaceBetweenTotalAndPer = getSpacesString(26)
+        println("${spaceBeforeTotal}${student.totalMarksScored()}${spaceBetweenTotalAndPer}${student.percentage()}%")
+        println()
+    }
 
     fun showMenu() {
         var userWantsToExitFlag = false
@@ -101,6 +148,7 @@ class StudentRecords {
                 "2" -> {
                     deleteStudent()
                 }
+
                 "3" -> {
                     println("1) Search student by roll number ")
                     println("2) Search student by name ")
